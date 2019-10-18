@@ -11,3 +11,9 @@ Whenever you make a change to this repository, you will have to manually refresh
 This panel provides an improved heatmap visualization from bucketed histogram data (e.g. from Prometheus or Netflix Atlas).
 
 ![Plugin example](doc/img/heatmap.png)
+
+Some advantages over the Heatmap panel included in Grafana:
+
+1. Zero values are light gray instead of interpolated on the color spectrum, so it's easier to distinguish zero and near zero values.
+2. The y-axis has settable bounds and y-axis labels never overlap.
+3. The x-axis is time-scale aggregable, allowing you to set a maximum number of x-ticks. In this way you can visualize a large timescale without displaying many thousands of individual buckets which obscure the data and make the visualization perform badly.
