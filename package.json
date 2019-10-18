@@ -1,0 +1,46 @@
+{
+  "name": "trace-exemplars",
+  "version": "1.0.0",
+  "description": "Grafana Trace Exemplar Heatmaps Plugin",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
+  },
+  "author": "Jon Schneider",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@babel/core": "7.4.3",
+    "@babel/preset-env": "7.4.2",
+    "@babel/preset-react": "7.0.0",
+    "@babel/preset-typescript": "7.3.3",
+    "@grafana/data": "latest",
+    "@grafana/toolkit": "latest",
+    "@grafana/ui": "latest",
+    "@types/slate": "^0.44.12",
+    "@types/slate-react": "^0.22.4",
+    "babel-loader": "8.0.5",
+    "copy-webpack-plugin": "^5.0.4",
+    "css-loader": "^3.2.0",
+    "es6-promise": "^4.2.8",
+    "loader-utils": "^1.1.0",
+    "sass-loader": "^8.0.0",
+    "slate": "^0.47.4",
+    "slate-plain-serializer": "^0.7.6",
+    "slate-prism": "^0.5.0",
+    "slate-react": "^0.22.4",
+    "ts-loader": "5.3.3",
+    "tslint": "^5.18.0",
+    "tslint-loader": "^3.5.4",
+    "tslint-react": "^4.0.0",
+    "typescript": "3.4.1",
+    "webpack": "4.29.6",
+    "webpack-cli": "^3.3.6"
+  },
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "d3": "^5.12.0",
+    "d3-scale-chromatic": "^1.5.0"
+  }
+}

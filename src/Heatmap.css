@@ -1,0 +1,27 @@
+.grid-line {
+  stroke: #bbb;
+  stroke-width: 1;
+}
+
+.grid-line.dark {
+  stroke: #333;
+}
+
+.heatmap-bucket {
+  fill: #eee;
+  stroke: #bbb;
+  stroke-width: 1;
+}
+
+.heatmap-bucket.dark {
+  fill: #222;
+  stroke: #333;
+}
+
+.axis.dark {
+  fill: #ccc;
+}
+
+.trace-marker {
+  fill: magenta;
+}
