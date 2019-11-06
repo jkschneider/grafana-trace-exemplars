@@ -58,12 +58,13 @@ export function Heatmap(props: HeatmapProps) {
   const maxTime = props.timeslices.length > 0 ? props.timeslices[props.timeslices.length - 1].timestamp : 0;
 
   // timeslice index with the most buckets
-  const maxBucketTimesliceIndex = props.timeslices
-    .reduce((acc, cur, index) => {
+  const maxBucketTimesliceIndex = props.timeslices.reduce(
+    (acc, cur, index) => {
       const filteredBuckets = cur.buckets.filter(bucketFilter);
-      return filteredBuckets.length > acc.bucketLength ?
-        { index: index, bucketLength: filteredBuckets.length } : acc;
-    }, { index: -1, bucketLength: -1 }).index;
+      return filteredBuckets.length > acc.bucketLength ? { index: index, bucketLength: filteredBuckets.length } : acc;
+    },
+    { index: -1, bucketLength: -1 }
+  ).index;
 
   const bucketRange = props.timeslices[maxBucketTimesliceIndex].buckets.filter(bucketFilter);
 
@@ -74,7 +75,7 @@ export function Heatmap(props: HeatmapProps) {
   const bucketWidth = width / props.timeslices.length;
 
   // x-axis settings
-//  const xTicks = width / (Math.ceil(X_TICK_SIZE_PX / bucketWidth) * bucketWidth);
+  //  const xTicks = width / (Math.ceil(X_TICK_SIZE_PX / bucketWidth) * bucketWidth);
   const xTicks = Math.floor(props.timeslices.length / Math.ceil(X_TICK_SIZE_PX / bucketWidth));
   const xTickIndexIncrement = Math.floor((props.timeslices.length - 1) / (xTicks - 1));
   const chartTimeFormat = grafanaTimeFormat(xTicks, minTime, maxTime);
@@ -87,136 +88,126 @@ export function Heatmap(props: HeatmapProps) {
   const yTicks = Math.floor(bucketRange.length / Math.ceil(Y_TICK_SIZE_PX / bucketHeight));
   const yTickIndexIncrement = Math.floor((bucketRange.length - 1) / (yTicks - 1));
   const yAxisFormat = (bucket: number) =>
-    bucket === Infinity ? '+Inf' : getValueFormat(props.units || 'none')(bucket, props.decimals);
+   bucket === Infinity ? '+Inf' : getValueFormat(props.units || 'none')(bucket, props.decimals);
 
   return (
     <svg
-      className={classNames('heatmap', { 'dark': props.dark })}
+      className={classNames('heatmap', { dark: props.dark })}
       viewBox={`0 0 ${props.width} ${props.height}`}>
-        <g>
-          {
-            // y-axis
-            maxBucketTimesliceIndex > -1 &&
-            mapNumber(yTicks, tick => {
-              const lastTick = tick === yTicks - 1;
-              const index = lastTick ? bucketRange.length - 1 : tick * yTickIndexIncrement;
-              const bucket = bucketRange[index];
-              const y = height - (index * bucketHeight) - (
-                lastTick ? bucketHeight : (bucketHeight / 2)
-              );
-              return (
-                <text
-                  key={`yaxis-${tick}`}
-                  className={classNames('axis', { 'dark': props.dark })}
-                  textAnchor={'end'}
-                  alignmentBaseline={lastTick ? 'hanging' : 'middle'}
-                  x={Y_AXIS_WIDTH-10}
-                  y={y}>
-                  { yAxisFormat(bucket.value) }
-                </text>
-              );
-            })
-          }
-        </g>
-        <g>
-          {
-            // x-axis
-            maxBucketTimesliceIndex > -1 &&
-            mapNumber(xTicks, tick => {
-              const index = tick * xTickIndexIncrement;
-              const lastTick = tick === xTicks-1;
-              return (
-                <text
-                  key={`xaxis-${tick}`}
-                  className={classNames('axis', { 'dark': props.dark })}
-                  textAnchor={lastTick ? 'end' : 'middle'}
-                  x={
-                    Y_AXIS_WIDTH + (index * bucketWidth) +
-                      (lastTick ? bucketWidth : bucketWidth/2)
-                  }
-                  y={props.height - 10}
-                >
-                  { xAxisFormat(props.timeslices[index].timestamp) }
-                </text>
-              );
-            })
-          }
-        </g>
-        <g>
-          {
-            // horizontal grid
-            maxBucketTimesliceIndex > -1 &&
-            mapNumber(bucketRange.length + 1, bucketIndex => (
-              <line
-                key={`hgrid-${bucketIndex}`}
-                x1={Y_AXIS_WIDTH}
-                x2={props.width}
-                y1={bucketIndex * bucketHeight}
-                y2={bucketIndex * bucketHeight}
-                className={classNames('grid-line', { 'dark': props.dark })}/>
-            ))
-          }
-        </g>
-        <g>
-          {
-            // vertical grid
-            mapNumber(props.timeslices.length + 1, timesliceIndex => {
-              const x = Y_AXIS_WIDTH + (timesliceIndex * bucketWidth);
-              return (
-                <line
-                  key={`vgrid-${timesliceIndex}`}
-                  x1={x}
-                  x2={x}
-                  y1={0}
-                  y2={height}
-                  className={classNames('grid-line', { 'dark': props.dark })}/>
-              );
-            })
-          }
-        </g>
-        <g>
-          {
-            // colored heatmap cells
-            props.timeslices.flatMap((timeslice, timesliceIndex) =>
-              timeslice.buckets.filter(bucketFilter).map((bucket, bucketIndex) => {
-                const x = timesliceIndex * bucketWidth + Y_AXIS_WIDTH;
-                const y = (bucketRange.length - bucketIndex - 1) * bucketHeight;
+      <g>
+        {// y-axis
+        maxBucketTimesliceIndex > -1 &&
+          mapNumber(yTicks, tick => {
+            const lastTick = tick === yTicks - 1;
+            const index = lastTick ? bucketRange.length - 1 : tick * yTickIndexIncrement;
+            const bucket = bucketRange[index];
+            const y = height - index * bucketHeight - (lastTick ? bucketHeight : bucketHeight / 2);
+            return (
+              <text
+                key={`yaxis-${tick}`}
+                className={classNames('axis', { dark: props.dark })}
+                textAnchor={'end'}
+                alignmentBaseline={lastTick ? 'hanging' : 'middle'}
+                x={Y_AXIS_WIDTH - 10}
+                y={y}
+              >
+                {yAxisFormat(bucket.value)}
+              </text>
+            );
+          })}
+      </g>
+      <g>
+        {// x-axis
+        maxBucketTimesliceIndex > -1 &&
+          mapNumber(xTicks, tick => {
+            const index = tick * xTickIndexIncrement;
+            const lastTick = tick === xTicks - 1;
+            return (
+              <text
+                key={`xaxis-${tick}`}
+                className={classNames('axis', { dark: props.dark })}
+                textAnchor={lastTick ? 'end' : 'middle'}
+                x={Y_AXIS_WIDTH + index * bucketWidth + (lastTick ? bucketWidth : bucketWidth / 2)}
+                y={props.height - 10}
+              >
+                {xAxisFormat(props.timeslices[index].timestamp)}
+              </text>
+            );
+          })}
+      </g>
+      <g>
+        {// horizontal grid
+        maxBucketTimesliceIndex > -1 &&
+          mapNumber(bucketRange.length + 1, bucketIndex => (
+            <line
+              key={`hgrid-${bucketIndex}`}
+              x1={Y_AXIS_WIDTH}
+              x2={props.width}
+              y1={bucketIndex * bucketHeight}
+              y2={bucketIndex * bucketHeight}
+              className={classNames('grid-line', { dark: props.dark })}
+            />
+          ))}
+      </g>
+      <g>
+        {// vertical grid
+        mapNumber(props.timeslices.length + 1, timesliceIndex => {
+          const x = Y_AXIS_WIDTH + (timesliceIndex * bucketWidth);
+          return (
+            <line
+              key={`vgrid-${timesliceIndex}`}
+              x1={x}
+              x2={x}
+              y1={0}
+              y2={height}
+              className={classNames('grid-line', { dark: props.dark })}
+            />
+          );
+        })}
+      </g>
+      <g>
+        {// colored heatmap cells
+        props.timeslices.flatMap((timeslice, timesliceIndex) =>
+          timeslice.buckets.filter(bucketFilter).map((bucket, bucketIndex) => {
+            const x = timesliceIndex * bucketWidth + Y_AXIS_WIDTH;
+            const y = (bucketRange.length - bucketIndex - 1) * bucketHeight;
 
-                const bucketHeatFill = bucket.count === 0 ? {} :
-                  { fill: colorScale(bucket.count) };
+            const bucketHeatFill = bucket.count === 0 ? {} :
+              { fill: colorScale(bucket.count) };
 
-                const bucketHeatRect =
-                    <rect
-                      className={classNames('heatmap-bucket', { 'dark': props.dark })}
-                      width={bucketWidth}
-                      height={bucketHeight}
-                      x={x}
-                      y={y}
-                      style={bucketHeatFill}
-                    />;
+            const bucketHeatRect = (
+              <rect
+                className={classNames('heatmap-bucket', { dark: props.dark })}
+                width={bucketWidth}
+                height={bucketHeight}
+                x={x}
+                y={y}
+                style={bucketHeatFill}
+              />
+            );
 
-                return (
-                  <g key={`${timesliceIndex},${bucketIndex}`}>
-                    {
-                      !!bucket.trace ?
-                        <a href={bucket.trace} target={'_blank'}>
-                          <g>
-                            { bucketHeatRect }
-                            <circle
-                              className={'trace-marker'}
-                              cx={x + (bucketWidth/2)}
-                              cy={y + (bucketHeight/2)}
-                              r={Math.min(MAX_TRACE_MARKER_RADIUS, (Math.min(bucketWidth, bucketHeight)*0.8)/2)}/>
-                          </g>
-                        </a> :
-                        bucketHeatRect
-                    }
-                  </g>
-                );
-              })
-            )
-          }
-        </g>
+            return (
+              <g key={`${timesliceIndex},${bucketIndex}`}>
+                {!!bucket.trace ? (
+                  <a href={bucket.trace} target={'_blank'}>
+                    <g>
+                      {bucketHeatRect}
+                      <circle
+                        className={'trace-marker'}
+                        cx={x + bucketWidth / 2}
+                        cy={y + bucketHeight / 2}
+                        r={Math.min(MAX_TRACE_MARKER_RADIUS, (Math.min(bucketWidth, bucketHeight) * 0.8) / 2)}
+                      />
+                    </g>
+                  </a>
+                ) : (
+                  bucketHeatRect
+                )}
+              </g>
+            );
+          })
+        )}
+      </g>
     </svg>
   );
 }
