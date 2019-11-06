@@ -2,7 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-
 module.exports = {
   target: 'node',
   watch: true,
@@ -14,9 +13,9 @@ module.exports = {
     libraryTarget: "amd"
   },
   externals: [
-    // remove the line below if you don't want to use buildin versions
+    // remove the line below if you don't want to use built-in versions
     'jquery', 'lodash', 'moment', 'angular',
-    'react', 'react-dom', '@grafana/ui', 
+    'react', 'react-dom', '@grafana/ui',
     '@grafana/data', '@grafana/runtime',
     'slate', 'slate-react',
     function(context, request, callback) {
@@ -61,7 +60,11 @@ module.exports = {
           "ts-loader"
         ],
         exclude: /node_modules/,
-      }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
     ]
   }
 }

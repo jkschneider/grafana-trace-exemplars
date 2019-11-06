@@ -12,6 +12,12 @@ interface PrometheusDataFrame extends DataFrame {
   rows: number[][];
 }
 
+const EMPTY_PANEL = (
+  <div className="panel-empty">
+    <p>No data found in response</p>
+  </div>
+);
+
 export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps> = ({
   data,
   // @ts-ignore
@@ -21,12 +27,9 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
   height,
   options,
 }) => {
+
   if (!data) {
-    return (
-      <div className="panel-empty">
-        <p>No data found in response</p>
-      </div>
-    );
+    return EMPTY_PANEL;
   }
 
   const prometheusToHeatmap = (data: PanelData): Timeslice[] =>
@@ -78,11 +81,17 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
     }, new Array<Timeslice>());
   };
 
+  const timeslices = aggregateTimeSeries(prometheusToHeatmap(data));
+
+  if (timeslices.length === 0) {
+    return EMPTY_PANEL;
+  }
+
   return (
     <Heatmap
       width={width}
       height={height}
-      timeslices={aggregateTimeSeries(prometheusToHeatmap(data))}
+      timeslices={timeslices}
       dark={false}
       units={options.fieldOptions.defaults.unit}
       decimals={options.fieldOptions.defaults.decimals || 2}

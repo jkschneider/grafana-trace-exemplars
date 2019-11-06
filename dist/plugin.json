@@ -1,0 +1,29 @@
+{
+  "type": "panel",
+  "name": "Trace Exemplar Heatmap",
+  "id": "trace-exemplar-heatmap",
+
+  "info": {
+    "description": "Trace Exemplar Heatmap",
+    "author": {
+      "name": "Jon Schneider"
+    },
+    "keywords": ["Trace", "Exemplar", "Heatmap", "Distributed Tracing", "Latency"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {"name": "Website", "url": "https://github.com/jkschneider/grafana-trace-exemplars"},
+      {"name": "License", "url": "https://github.com/jkschneider/grafana-trace-exemplars/blob/master/LICENSE"}
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "6.3.x",
+    "plugins": []
+  }
+}
