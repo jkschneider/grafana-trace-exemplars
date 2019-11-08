@@ -6,17 +6,7 @@ import classNames from 'classnames';
 
 import './Heatmap.css';
 import { timeFormat as grafanaTimeFormat } from './timeFormat';
-
-export interface Bucket {
-  value: number;
-  count: number;
-  trace?: string;
-}
-
-export interface Timeslice {
-  timestamp: number;
-  buckets: Bucket[];
-}
+import { Bucket, Timeslice } from './types';
 
 export interface HeatmapProps {
   timeslices: Timeslice[];
@@ -167,8 +157,8 @@ export function Heatmap(props: HeatmapProps) {
       </g>
       <g>
         {// colored heatmap cells
-        props.timeslices.flatMap((timeslice, timesliceIndex) =>
-          timeslice.buckets.filter(bucketFilter).map((bucket, bucketIndex) => {
+        props.timeslices.flatMap((timeslice, timesliceIndex) => {
+          return timeslice.buckets.filter(bucketFilter).map((bucket, bucketIndex) => {
             const x = timesliceIndex * bucketWidth + Y_AXIS_WIDTH;
             const y = (bucketRange.length - bucketIndex - 1) * bucketHeight;
 
@@ -188,8 +178,8 @@ export function Heatmap(props: HeatmapProps) {
 
             return (
               <g key={`${timesliceIndex},${bucketIndex}`}>
-                {!!bucket.trace ? (
-                  <a href={bucket.trace} target={'_blank'}>
+                {!!bucket.traceExemplar ? (
+                  <a href={bucket.traceExemplar.link} target={'_blank'}>
                     <g>
                       {bucketHeatRect}
                       <circle
@@ -205,8 +195,8 @@ export function Heatmap(props: HeatmapProps) {
                 )}
               </g>
             );
-          })
-        )}
+          });
+        })}
       </g>
     </svg>
   );

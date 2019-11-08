@@ -30366,8 +30366,8 @@ function Heatmap(props) {
       });
       return react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("g", {
         key: timesliceIndex + "," + bucketIndex
-      }, !!bucket.trace ? react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("a", {
-        href: bucket.trace,
+      }, !!bucket.traceExemplar ? react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("a", {
+        href: bucket.traceExemplar.link,
         target: '_blank'
       }, react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("g", null, bucketHeatRect, react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("circle", {
         className: 'trace-marker',
@@ -30402,13 +30402,15 @@ var EMPTY_PANEL = react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("di
   className: "panel-empty"
 }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("p", null, "No data found in response"));
 var TraceExemplarPanel = function TraceExemplarPanel(_a) {
+  var e_1, _b;
+
   var data = _a.data,
-      // @ts-ignore
-  timeRange = _a.timeRange,
+      timeRange = _a.timeRange,
       timeZone = _a.timeZone,
       width = _a.width,
       height = _a.height,
       options = _a.options;
+  console.log(data);
 
   if (!data) {
     return EMPTY_PANEL;
@@ -30421,7 +30423,7 @@ var TraceExemplarPanel = function TraceExemplarPanel(_a) {
           ts = _b[1];
 
       var buckets = data.series.filter(function (series) {
-        return series.rows[index][0] !== null;
+        return series.rows && series.rows[index][0] !== null;
       }).map(function (series) {
         return {
           value: series.fields[0].name === '+Inf' ? Infinity : +series.fields[0].name,
@@ -30474,6 +30476,58 @@ var TraceExemplarPanel = function TraceExemplarPanel(_a) {
   };
 
   var timeslices = aggregateTimeSeries(prometheusToHeatmap(data));
+  var traceExemplars = data.series.filter(function (series) {
+    return series.labels && series.labels.dataType === 'zipkin';
+  }).flatMap(function (series) {
+    return series.fields[0].values;
+  }).sort(function (a, b) {
+    return a.timestamp - b.timestamp;
+  });
+  var minimumTime = timeRange.from.unix() * 1000;
+
+  if (traceExemplars.length > 0) {
+    var traceExemplarIndex = 0;
+
+    try {
+      assignTraceExemplars: for (var timeslices_1 = tslib__WEBPACK_IMPORTED_MODULE_0__["__values"](timeslices), timeslices_1_1 = timeslices_1.next(); !timeslices_1_1.done; timeslices_1_1 = timeslices_1.next()) {
+        var timeslice = timeslices_1_1.value;
+
+        var _loop_1 = function _loop_1() {
+          var traceExemplar = traceExemplars[traceExemplarIndex++];
+          timeslice.buckets.find(function (bucket) {
+            return bucket.value <= traceExemplar.duration / 1000;
+          }).traceExemplar = traceExemplar;
+
+          if (traceExemplarIndex > traceExemplars.length - 1) {
+            return "break-assignTraceExemplars";
+          }
+        };
+
+        while (traceExemplars[traceExemplarIndex].timestamp <= timeslice.timestamp && traceExemplars[traceExemplarIndex].timestamp >= minimumTime) {
+          var state_1 = _loop_1();
+
+          switch (state_1) {
+            case "break-assignTraceExemplars":
+              break assignTraceExemplars;
+          }
+        }
+
+        minimumTime = timeslice.timestamp;
+      }
+    } catch (e_1_1) {
+      e_1 = {
+        error: e_1_1
+      };
+    } finally {
+      try {
+        if (timeslices_1_1 && !timeslices_1_1.done && (_b = timeslices_1.return)) _b.call(timeslices_1);
+      } finally {
+        if (e_1) throw e_1.error;
+      }
+    }
+  }
+
+  console.log(timeslices);
 
   if (timeslices.length === 0) {
     return EMPTY_PANEL;

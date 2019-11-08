@@ -1,14 +1,14 @@
 import React from 'react';
 import { PanelProps, PanelData } from '@grafana/ui';
-import { DataFrame, Field } from '@grafana/data';
-import { Heatmap, Timeslice } from './Heatmap';
+import { DataFrameDTO, FieldDTO } from '@grafana/data';
+import { Heatmap } from './Heatmap';
 
-import { TraceExemplarOptions } from './types';
+import { Timeslice, TraceExemplarOptions, ZipkinTraceFieldValue } from './types';
 
 interface TraceExemplarPanelProps extends PanelProps<TraceExemplarOptions> {}
 
-interface PrometheusDataFrame extends DataFrame {
-  fields: Field[];
+interface PrometheusDataFrame extends DataFrameDTO {
+  fields: FieldDTO[];
   rows: number[][];
 }
 
@@ -20,13 +20,13 @@ const EMPTY_PANEL = (
 
 export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps> = ({
   data,
-  // @ts-ignore
   timeRange,
   timeZone,
   width,
   height,
   options,
 }) => {
+  console.log(data);
 
   if (!data) {
     return EMPTY_PANEL;
@@ -34,9 +34,9 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
 
   const prometheusToHeatmap = (data: PanelData): Timeslice[] =>
     data.series.length === 0 ? [] :
-    (data.series[0] as PrometheusDataFrame).rows.map(([ _, ts], index) => {
-      const buckets = (data.series as PrometheusDataFrame[])
-      .filter(series => series.rows[index][0] !== null)
+    ((data.series[0] as DataFrameDTO) as PrometheusDataFrame).rows.map(([ _, ts], index) => {
+      const buckets = ((data.series as DataFrameDTO[]) as PrometheusDataFrame[])
+      .filter(series => series.rows && series.rows[index][0] !== null)
       .map(series => ({
         value: series.fields[0].name === '+Inf' ? Infinity : +series.fields[0].name,
         count: series.rows[index][0]
@@ -82,6 +82,31 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
   };
 
   const timeslices = aggregateTimeSeries(prometheusToHeatmap(data));
+
+  const traceExemplars = data.series
+    .filter(series => series.labels && series.labels.dataType === 'zipkin')
+    .flatMap(series => (series.fields[0] as FieldDTO).values)
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  let minimumTime = timeRange.from.unix() * 1000;
+  if (traceExemplars.length > 0) {
+    let traceExemplarIndex = 0;
+
+    assignTraceExemplars: for (const timeslice of timeslices) {
+      while (traceExemplars[traceExemplarIndex].timestamp <= timeslice.timestamp &&
+        traceExemplars[traceExemplarIndex].timestamp >= minimumTime) {
+        const traceExemplar = traceExemplars[traceExemplarIndex++];
+        timeslice.buckets.find(bucket => bucket.value <= traceExemplar.duration / 1000)
+          .traceExemplar = traceExemplar;
+        if (traceExemplarIndex > traceExemplars.length - 1) {
+          break assignTraceExemplars;
+        }
+      }
+      minimumTime = timeslice.timestamp;
+    }
+  }
+
+  console.log(timeslices);
 
   if (timeslices.length === 0) {
     return EMPTY_PANEL;
