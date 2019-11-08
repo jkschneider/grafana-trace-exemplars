@@ -30226,7 +30226,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var MAX_TRACE_MARKER_RADIUS = 8,
+var MAX_TRACE_MARKER_RADIUS = 3,
     Y_AXIS_WIDTH = 100,
     Y_TICK_SIZE_PX = 16,
     X_AXIS_HEIGHT = 30,
@@ -30416,7 +30416,7 @@ var TraceExemplarPanel = function TraceExemplarPanel(_a) {
   }
 
   var prometheusToHeatmap = function prometheusToHeatmap(data) {
-    return data.series.length === 0 ? [] : data.series[0].rows.map(function (_a, index) {
+    return data.series.length === 0 || !data.series[0].rows ? [] : data.series[0].rows.map(function (_a, index) {
       var _b = tslib__WEBPACK_IMPORTED_MODULE_0__["__read"](_a, 2),
           _ = _b[0],
           ts = _b[1];

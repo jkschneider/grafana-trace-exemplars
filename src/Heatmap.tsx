@@ -21,7 +21,7 @@ export interface HeatmapProps {
 }
 
 const
-  MAX_TRACE_MARKER_RADIUS = 8,
+  MAX_TRACE_MARKER_RADIUS = 3,
   Y_AXIS_WIDTH = 100,
   Y_TICK_SIZE_PX = 16,
   X_AXIS_HEIGHT = 30,

@@ -31,7 +31,7 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
   }
 
   const prometheusToHeatmap = (data: PanelData): Timeslice[] =>
-    data.series.length === 0 ? [] :
+    data.series.length === 0 || !((data.series[0] as DataFrameDTO) as PrometheusDataFrame).rows ? [] :
     ((data.series[0] as DataFrameDTO) as PrometheusDataFrame).rows.map(([ _, ts], index) => {
       const buckets = ((data.series as DataFrameDTO[]) as PrometheusDataFrame[])
       .filter(series => series.rows && series.rows[index][0] !== null)
