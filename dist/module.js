@@ -30297,7 +30297,7 @@ function Heatmap(props) {
     var lastTick = tick === yTicks - 1;
     var index = lastTick ? bucketRange.length - 1 : tick * yTickIndexIncrement;
     var bucket = bucketRange[index];
-    var y = height - index * bucketHeight - (lastTick ? bucketHeight : bucketHeight / 2);
+    var y = height - index * bucketHeight - bucketHeight;
     return react__WEBPACK_IMPORTED_MODULE_3___default.a.createElement("text", {
       key: "yaxis-" + tick,
       className: classnames__WEBPACK_IMPORTED_MODULE_5___default()('axis', {
@@ -30410,7 +30410,6 @@ var TraceExemplarPanel = function TraceExemplarPanel(_a) {
       width = _a.width,
       height = _a.height,
       options = _a.options;
-  console.log(data);
 
   if (!data) {
     return EMPTY_PANEL;
@@ -30494,9 +30493,13 @@ var TraceExemplarPanel = function TraceExemplarPanel(_a) {
 
         var _loop_1 = function _loop_1() {
           var traceExemplar = traceExemplars[traceExemplarIndex++];
-          timeslice.buckets.find(function (bucket) {
-            return bucket.value <= traceExemplar.duration / 1000;
-          }).traceExemplar = traceExemplar;
+          var bucket = timeslice.buckets.find(function (bucket) {
+            return traceExemplar.durationSeconds <= bucket.value;
+          });
+
+          if (bucket) {
+            bucket.traceExemplar = traceExemplar;
+          }
 
           if (traceExemplarIndex > traceExemplars.length - 1) {
             return "break-assignTraceExemplars";
@@ -30526,8 +30529,6 @@ var TraceExemplarPanel = function TraceExemplarPanel(_a) {
       }
     }
   }
-
-  console.log(timeslices);
 
   if (timeslices.length === 0) {
     return EMPTY_PANEL;

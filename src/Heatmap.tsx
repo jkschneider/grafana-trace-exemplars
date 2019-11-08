@@ -91,12 +91,12 @@ export function Heatmap(props: HeatmapProps) {
             const lastTick = tick === yTicks - 1;
             const index = lastTick ? bucketRange.length - 1 : tick * yTickIndexIncrement;
             const bucket = bucketRange[index];
-            const y = height - index * bucketHeight - (lastTick ? bucketHeight : bucketHeight / 2);
+            const y = height - index * bucketHeight - bucketHeight;
             return (
               <text
                 key={`yaxis-${tick}`}
                 className={classNames('axis', { dark: props.dark })}
-                textAnchor={'end'}
+                textAnchor='end'
                 alignmentBaseline={lastTick ? 'hanging' : 'middle'}
                 x={Y_AXIS_WIDTH - 10}
                 y={y}

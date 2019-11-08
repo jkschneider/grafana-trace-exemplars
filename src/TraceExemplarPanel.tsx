@@ -3,7 +3,7 @@ import { PanelProps, PanelData } from '@grafana/ui';
 import { DataFrameDTO, FieldDTO } from '@grafana/data';
 import { Heatmap } from './Heatmap';
 
-import { Timeslice, TraceExemplarOptions, ZipkinTraceFieldValue } from './types';
+import { Timeslice, TraceExemplarOptions } from './types';
 
 interface TraceExemplarPanelProps extends PanelProps<TraceExemplarOptions> {}
 
@@ -26,8 +26,6 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
   height,
   options,
 }) => {
-  console.log(data);
-
   if (!data) {
     return EMPTY_PANEL;
   }
@@ -96,8 +94,10 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
       while (traceExemplars[traceExemplarIndex].timestamp <= timeslice.timestamp &&
         traceExemplars[traceExemplarIndex].timestamp >= minimumTime) {
         const traceExemplar = traceExemplars[traceExemplarIndex++];
-        timeslice.buckets.find(bucket => bucket.value <= traceExemplar.duration / 1000)
-          .traceExemplar = traceExemplar;
+        const bucket = timeslice.buckets.find(bucket => traceExemplar.durationSeconds <= bucket.value);
+        if (bucket) {
+          bucket.traceExemplar = traceExemplar;
+        }
         if (traceExemplarIndex > traceExemplars.length - 1) {
           break assignTraceExemplars;
         }
@@ -105,8 +105,6 @@ export const TraceExemplarPanel: React.FunctionComponent<TraceExemplarPanelProps
       minimumTime = timeslice.timestamp;
     }
   }
-
-  console.log(timeslices);
 
   if (timeslices.length === 0) {
     return EMPTY_PANEL;
