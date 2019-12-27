@@ -14,6 +14,5 @@ This panel provides an improved heatmap visualization from bucketed histogram da
 
 Some advantages over the Heatmap panel included in Grafana:
 
-1. Zero values are light gray instead of interpolated on the color spectrum, so it's easier to distinguish zero and near zero values. Empty values are dispalyed in white.
-2. The y-axis has settable bounds and y-axis labels never overlap.
-3. The x-axis is time-scale aggregable, allowing you to set a maximum number of x-ticks. In this way you can visualize a large timescale without displaying many thousands of individual buckets which obscure the data and make the visualization perform badly.
+1. The y-axis has settable bounds and y-axis labels never overlap.
+2. The x-axis is time-scale aggregable, allowing you to set a maximum number of x-ticks. In this way you can visualize a large timescale without displaying many thousands of individual buckets which obscure the data and make the visualization perform badly.
